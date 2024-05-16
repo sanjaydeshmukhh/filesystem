@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> <%= title %> </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+</head>
+<body>
+    <div class="main h-screen w-full bg-slate-300 pr-8 pl-8" >
+        <div class="links pt-10">
+                <a href="/" class="text-xl  tracking-tighter mr-6 ">
+                    View File
+                </a> 
+            <a href="create" class="text-xl tracking-tighter">create file</a>
+        </div>
+
+        <div class="card-container flex gap-10 flex-wrap items-center ">
+            <% data.forEach(function(item) { %>
+            <div class="card-content flex flex-col text-center gap-8 p-5 h-60 w-60 bg-white mt-6 rounded-md">
+                <h3 class="text-3xl "><%= item.name %> </h3>
+                <p class="text-lg"><%= item.description %> </p>
+                <!-- Delete Button Form -->
+            <form action="/delete/<%= item.name %>" method="post" class="relative bottom-0">
+                <button type="submit" class="delete-button">
+                    ❌
+                </button>
+            </form>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+</body>
+</html>
