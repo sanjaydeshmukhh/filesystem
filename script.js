@@ -11,47 +11,23 @@ app.use(express.urlencoded( { extended: true }))
 
 
 app.get("/", function (req, res) {
-    fs.readdir("./files", { withFileTypes: true }, (err, files) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send("Error reading directory");
-            return;
-        }
-
-        // Initialize an array to hold the file data
-        let data = [];
-
-        // Process each file
+    try {
+        const files = fs.readdirSync("./files");
+        const data = [];
         files.forEach((file) => {
-            // Construct the full file path
-            const filePath = path.join(__dirname, "files", file.name);
-
-            // Read the file content
-            fs.readFile(filePath, "utf8", (readErr, fileContent) => {
-                if (readErr) {
-                    console.error(readErr);
-                    // Handle error reading the file
-                    return;
-                }
-
-                // Prepare the file data
-                const fileData = {
-                    name: file.name,
-                    description: fileContent,
-                };
-
-                // Add the file data to the array
-                data.push(fileData);
-
-                // After all files are processed, render the view
-                if (data.length === files.length) {
-                    res.render("index", { title: "homepage", data });
-                }
+            const filePath = path.join(__dirname, "files", file);
+            const fileContent = fs.readFileSync(filePath, "utf8");
+            data.push({
+                name: file,
+                description: fileContent,
             });
         });
-    });
+        res.render("index", { title: "homepage", data });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error reading directory");
+    }
 });
-
 // script.js
 
 app.post('/delete/:filename', (req, res) => {
@@ -72,17 +48,17 @@ app.get("/create", (req,res)=> {
     res.render('create')
 })
 
-app.post("/create", (req, res)=> {
-    //  const filename = req.body.filename;
-    // const description = req.body.description;
+app.post("/create", (req, res) => {
+    try {
+        fs.writeFileSync(`./files/${req.body.filename}`, req.body.description);
+        console.log("File written successfully");
+        res.redirect("/");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error creating file");
+    }
+});
 
-    fs.writeFile(`./files/${req.body.filename}`, req.body.description, err =>{
-        if(err) console.log(err)
-            else {
-                console.log("file written succesfully")
-            }
-    })
-})
 
 
 app.listen(3000)
